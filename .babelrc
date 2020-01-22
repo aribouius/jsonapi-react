@@ -1,0 +1,39 @@
+{
+"presets": [
+  [
+    "@babel/env",
+    {
+      "modules": false,
+      "exclude": [
+        "@babel/plugin-transform-regenerator"
+      ]
+    }
+  ],
+  "@babel/react"
+],
+"plugins": [
+  [
+    "module:fast-async",
+    {
+      "compiler": {
+        "noRuntime": true
+      }
+    }
+  ]
+],
+"env": {
+  "test": {
+    "presets": [
+      [
+        "@babel/env",
+        {
+          "modules": "commonjs",
+          "exclude": [
+            "@babel/plugin-transform-regenerator"
+          ]
+        }
+      ]
+    ]
+  }
+}
+}
