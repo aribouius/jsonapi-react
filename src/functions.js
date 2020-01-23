@@ -151,7 +151,7 @@ export function coerceValue(val, type) {
     case 'float':
       return val ? parseFloat(val, 10) : val
     case 'date':
-      return new Date(val)
+      return val ? new Date(val) : val
     case 'boolean':
       return !!val
     default:
