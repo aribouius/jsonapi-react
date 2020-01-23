@@ -146,7 +146,8 @@ export class ApiClient {
 
       query.cache = await this.request(query.url, { headers })
       query.timestamp = new Date().getTime()
-
+      query.promise = null
+      
       const result = this.normalize(query.cache)
 
       this.dispatch({
@@ -163,8 +164,6 @@ export class ApiClient {
       if (!this.config.ssrMode) {
         this.scheduleGC(query, query.cacheTime)
       }
-
-      query.promise = null
 
       return result
     })())
