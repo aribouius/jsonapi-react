@@ -147,7 +147,7 @@ export class ApiClient {
       query.cache = await this.request(query.url, { headers })
       query.timestamp = new Date().getTime()
       query.promise = null
-      
+
       const result = this.normalize(query.cache)
 
       this.dispatch({
@@ -199,21 +199,21 @@ export class ApiClient {
     })
 
     if (!schema.error && !schema.errors) {
-      let related = invalidate
+      let invalid
 
-      if (related === undefined) {
-        related = relationships.length ? relationships : null
-      } else if (related && !Array.isArray(related)) {
-        related = [related]
+      if (invalidate) {
+        invalid = Array.isArray(invalidate) ? invalidate : [invalidate]
+      } else if (invalidate !== false) {
+        invalid = [type, ...relationships]
       }
 
       this.cache.forEach(q => {
         if (q.id && q.url === query.url && schema.data) {
           q.cache = schema
-          return query.dispatch({ result })
+          return q.dispatch({ result })
         }
 
-        if (!related) {
+        if (!invalid) {
           return
         }
 
@@ -221,11 +221,9 @@ export class ApiClient {
           Object.assign(q, getTypeMap(q, this.schema))
         }
 
-        const invalid =
-          q.type === type ||
-          related.find(r => query.relationships.indexOf(r) >= 0)
+        const types = [q.type, ...q.relationships]
 
-        if (invalid) {
+        if (types.find(t => invalid.indexOf(t) >= 0)) {
           q.cache = null
 
           if (q.subscribers.length) {
