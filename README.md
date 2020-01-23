@@ -102,16 +102,13 @@ new ApiClient({
 })
 ```
 
-As an added benefit, you can also describe and customize how fields get deserialized.  Field configuration is entirely _additive_, so any omitted fields are simply passed through unchanged.
+You can also describe and customize how fields get deserialized.  Field configuration is entirely _additive_, so any omitted fields are simply passed through unchanged.
 ```javascript
 const schema = {
   todos: {
     type: 'todos',
     fields: {
       title: 'string', // shorthand
-      priority: {
-        type: 'number', // converts value to integer
-      },
       status: {
         resolve: status => {
           return status.toUpperCase()
@@ -432,10 +429,10 @@ const result = useQuery('todos', { ssr: false })
 - `config: Object`
   - `cacheTime: Int | null`:
     - The number of seconds to cache the query.
-    - Defaults client configuration value.
+    - Defaults to client configuration value.
   - `staleTime: Int | null`
     - The number of seconds until the query becomes stale.
-    - Defaults client configuration value.
+    - Defaults to client configuration value.
   - `ssr: Boolean`
     - Set to `false` to disable server-side rendering of query.
     - Defaults to context value.
@@ -483,6 +480,8 @@ const result = useQuery('todos', { ssr: false })
   - A `links` object returned from a successful request, if present.
 - `error: Object | undefined`
   - A request error, if thrown or returned from the server.
+- `errors: Array | undefined`
+  - Validation errors returned from the server.
 - `isLoading: Boolean`
   - Indicates whether the mutation is currently being submitted.
 - `client: ApiClient`
