@@ -1,6 +1,13 @@
 # jsonapi-react
 A minimal [JSON:API](https://jsonapi.org/) client and [React](https://reactjs.org/) hooks for fetching, updating, and caching remote data.
 
+<a href="https://bundlephobia.com/result?p=jsonapi-react@latest" target="\_parent">
+  <img src="https://badgen.net/bundlephobia/minzip/jsonapi-react@latest" />
+</a>
+<a href="https://travis-ci.com/aribouius/jsonapi-react" target="\_parent">
+  <img src="https://api.travis-ci.org/aribouius/jsonapi-react.svg?branch=master" />
+</a>
+
 ## Features
 - Declarative API queries and mutations
 - JSON:API schema serialization + normalization
