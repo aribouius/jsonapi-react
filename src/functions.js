@@ -283,7 +283,10 @@ export function serialize(data = {}, config = {}) {
   const attributes = { ...data }
   delete attributes.id
 
-  data = { id, type, attributes }
+  data = { type, attributes }
+  if (id) {
+    data.id = id
+  }
 
   if (schema[type]) {
     let root = schema[type]
