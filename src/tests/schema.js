@@ -3,8 +3,19 @@ export default {
     type: 'users',
     fields: {},
     relationships: {
+      profile: {
+        type: 'profiles',
+      },
       todos: {
         type: 'todos',
+      },
+    },
+  },
+  profiles: {
+    type: 'profiles',
+    relationships: {
+      user: {
+        type: 'users',
       },
     },
   },

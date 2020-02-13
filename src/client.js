@@ -1,9 +1,10 @@
 import { Query } from './query'
-import { parseSchema, serialize, normalize, getTypeMap } from './functions'
+import { parseSchema, getTypeMap } from './functions'
+import { Serializer } from './serializer'
 import * as actions from './constants'
 
 export class ApiClient {
-  constructor({ schema, ...config } = {}) {
+  constructor({ schema, plugins, ...config } = {}) {
     this.subscribers = []
     this.cache = []
     this.isMounted = false
@@ -15,8 +16,12 @@ export class ApiClient {
       cacheTime: 0,
       staleTime: null,
       ssrMode: typeof window === 'undefined',
-      serialize,
-      normalize,
+      serialize: (type, data, schema) => {
+        return new Serializer({ schema }).serialize(type, data)
+      },
+      normalize: (type, data, schema) => {
+        return new Serializer({ schema }).deserialize(type, data)
+      },
       ...config,
       fetch: config.fetch || fetch.bind(),
     }
@@ -27,6 +32,12 @@ export class ApiClient {
 
     if (schema) {
       this.schema = parseSchema(schema)
+    }
+
+    if (plugins) {
+      plugins.forEach(plugin => {
+        plugin.initialize(this)
+      })
     }
   }
 
@@ -40,12 +51,12 @@ export class ApiClient {
     return this
   }
 
-  serialize(data, config) {
-    return this.config.serialize(data, { ...config, schema: this.schema })
+  serialize(type, data) {
+    return this.config.serialize(type, data, this.schema)
   }
 
   normalize(data) {
-    return this.config.normalize(data, { schema: this.schema })
+    return this.config.normalize(data, this.schema)
   }
 
   subscribe(subscriber) {
@@ -176,10 +187,11 @@ export class ApiClient {
 
     const { method = query.id ? 'PATCH' : 'POST', headers, invalidate } = config
 
+
     const options = { method, headers }
 
     if (data !== undefined) {
-      data = this.serialize(data, { type, id: query.id })
+      data = this.serialize(type, query.id ? { id: query.id, ...data } : data)
       options.body = JSON.stringify(data)
     }
 
