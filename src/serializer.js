@@ -98,7 +98,7 @@ export class Serializer {
 
     if (res.errors) {
       const error = res.errors.find(e => e.status !== '422')
-      return error ? { error } : error
+      return error ? { error } : { errors: res.errors }
     }
 
     if (!res.data) {
