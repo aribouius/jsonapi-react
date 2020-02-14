@@ -16,6 +16,8 @@ export class ApiClient {
       cacheTime: 0,
       staleTime: null,
       ssrMode: typeof window === 'undefined',
+      formatError: null,
+      formatErrors: null,
       serialize: (type, data, schema) => {
         return new Serializer({ schema }).serialize(type, data)
       },
@@ -55,8 +57,22 @@ export class ApiClient {
     return this.config.serialize(type, data, this.schema)
   }
 
-  normalize(data) {
-    return this.config.normalize(data, this.schema)
+  normalize(data, extra) {
+    const result = this.config.normalize(data, this.schema)
+
+    if (!result) {
+      return null
+    }
+
+    if (result.error && this.config.formatError) {
+      result.error = this.config.formatError(result.error)
+    }
+
+    if (result.errors && this.config.formatErrors) {
+      result.errors = this.config.formatErrors(result.errors, extra)
+    }
+
+    return result
   }
 
   subscribe(subscriber) {
@@ -203,7 +219,7 @@ export class ApiClient {
     let result = await this.request(query.url, options)
     let schema = result
 
-    result = this.normalize(result)
+    result = this.normalize(result, { payload: data })
 
     this.dispatch({
       type: actions.RECEIVE_MUTATION,
