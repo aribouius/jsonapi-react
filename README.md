@@ -21,8 +21,8 @@ In short, to provide a similar client experience to using `React` + [GraphQL](ht
 The `JSON:API` specification offers numerous benefits for writing and consuming REST API's, but at the expense of clients being required to manage complex schema serializations. There are [several projects](https://jsonapi.org/implementations/) that provide good `JSON:API` implementations,
 but none offer a seamless integration with `React` without incorporating additional libraries and/or model abstractions.
 
-Libraries like [react-query](https://github.com/tannerlinsley/react-query) and [SWR](https://github.com/zeit/swr) (both of which are fantastic, and obvious inspirations for this project) go a far way in bridging the gap when coupled with a serialization library like [json-api-normalizer](https://github.com/yury-dymov/json-api-normalizer). But both require a non-trivial amount of configuration for cache invalidation and state updates,
-both of which can be abstracted away when working with a defined schema.
+Libraries like [react-query](https://github.com/tannerlinsley/react-query) and [SWR](https://github.com/zeit/swr) (both of which are fantastic, and obvious inspirations for this project) go a far way in bridging the gap when coupled with a serialization library like [json-api-normalizer](https://github.com/yury-dymov/json-api-normalizer). But both require a non-trivial amount of cache invalidation configuration, given resources can be returned from any number of endpoints.  
+
 
 ## Support
 - React 16.8 or later
@@ -514,6 +514,10 @@ const result = useQuery('todos', { ssr: false })
 - `ssrMode: Boolean`
   - Set to `true` when running in a server environment.
   - Defaults to result of `typeof window === 'undefined'`.
+- `formatError: Function(error)`
+  - A function that formats a response error object.
+- `formatErrors: Function(errors)`
+  - A function that formats a validation error objects.
 - `fetch: Function(url, options)`
   - Fetch implementation - defaults to the global `fetch`.
 - `fetchOptions: Object`
