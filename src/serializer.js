@@ -116,6 +116,7 @@ export class Serializer {
     }
 
     const fields = {}
+
     Object.keys(this.schema).forEach(ref => {
       fields[ref] = this.schema[ref].fields
     })
@@ -158,9 +159,13 @@ export class Serializer {
 
         if (!rel) return
 
-        const child = data.find(r => r.type === rel.type && r.id === rel.id)
-        if (child) {
-          rec.attributes[key] = child.attributes
+        if (Array.isArray(rel)) {
+          rec.attributes[key] = rel.map(r => (
+            data.find(d => d.type === r.type && d.id === r.id)
+          )).filter(Boolean).map(r => r.attributes)
+        } else {
+          const child = data.find(r => r.type === rel.type && r.id === rel.id)
+          rec.attributes[key] = child ? child.attributes : null
         }
       })
     })

@@ -21,8 +21,8 @@ export class ApiClient {
       serialize: (type, data, schema) => {
         return new Serializer({ schema }).serialize(type, data)
       },
-      normalize: (type, data, schema) => {
-        return new Serializer({ schema }).deserialize(type, data)
+      normalize: (data, schema) => {
+        return new Serializer({ schema }).deserialize(data)
       },
       ...config,
       fetch: config.fetch || fetch.bind(),
