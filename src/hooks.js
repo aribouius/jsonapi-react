@@ -60,7 +60,13 @@ export function useQuery(queryArg, config) {
   }
 
   React.useMemo(() => {
-    if (client.isCached(query, cacheTime)) {
+    if (!query.key) {
+      stateRef.current = {
+        isLoading: false,
+        isFetching: false,
+        ...stateRef.current,
+      }
+    } else if (client.isCached(query, cacheTime)) {
       stateRef.current = {
         isLoading: false,
         isFetching: !client.isCached(query, staleTime),
@@ -73,7 +79,7 @@ export function useQuery(queryArg, config) {
         isFetching: true,
       }
     }
-  }, [query])
+  }, [query.url])
 
   React.useEffect(() => {
     const cleanup = query.subscribe(req => {

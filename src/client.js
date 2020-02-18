@@ -188,7 +188,7 @@ export class ApiClient {
         result,
       })
 
-      if (!this.config.ssrMode) {
+      if (!this.config.ssrMode && !query.subscribers.length) {
         this.scheduleGC(query, query.cacheTime)
       }
 
