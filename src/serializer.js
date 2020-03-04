@@ -173,7 +173,7 @@ export class Serializer {
     if (Array.isArray(res.data)) {
       data = data.reduce(
         (acc, rec) =>
-          res.data.find(r => r.id === rec.id && r.type === res.type)
+          res.data.find(r => r.id === rec.id && r.type === rec.type)
             ? acc.concat(rec.attributes)
             : acc,
         []
