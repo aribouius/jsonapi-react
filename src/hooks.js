@@ -69,7 +69,7 @@ export function useQuery(queryArg, config) {
     } else if (client.isCached(query, cacheTime)) {
       stateRef.current = {
         isLoading: false,
-        isFetching: !client.isCached(query, staleTime),
+        isFetching: staleTime !== null && !client.isCached(query, staleTime),
         ...client.normalize(query.cache),
       }
     } else {

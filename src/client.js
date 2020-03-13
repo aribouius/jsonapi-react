@@ -150,7 +150,7 @@ export class ApiClient {
     }
 
     if (!config.force && this.isCached(query, cacheTime)) {
-      if (!this.isCached(query, staleTime)) {
+      if (staleTime !== null && !this.isCached(query, staleTime)) {
         this.fetch(query, { force: true })
       }
 
@@ -199,11 +199,9 @@ export class ApiClient {
   async mutate(queryArg, data, config = {}) {
     const query = new Query({ key: queryArg })
 
-    const { type, relationships } = getTypeMap(query, this.schema)
+    const { type, relationships } = getTypeMap(query, this.schema, data)
 
     const { method = query.id ? 'PATCH' : 'POST', headers, invalidate } = config
-
-
     const options = { method, headers }
 
     if (data !== undefined) {

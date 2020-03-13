@@ -92,7 +92,11 @@ export class Serializer {
         return res
       }
       return {
-        error: { status: String(res.status || 400), title: res.error },
+        error: {
+          status: String(res.status || 400),
+          title: res.error,
+          message: res.error,
+        },
       }
     }
 

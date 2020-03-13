@@ -110,36 +110,59 @@ export function parseTypes(keys, schema = {}) {
     if (!ref) {
       ref = schema[val]
     } else if (ref.relationships[val]) {
-      ref = schema[ref.relationships[val].type]
+      ref = ref.relationships[val]
     } else {
       ref = null
     }
 
     if (ref) {
       arr.push(ref.type)
+      ref = schema[ref.type]
     }
   }
 
   return arr.length ? arr : keys.slice(0, 1)
 }
 
-export function getTypeMap(query, schema) {
-  const relationships = parseTypes(query.keys, schema)
-  const type = relationships.pop()
+export function getTypeMap(query, schema, data) {
+  const rels = parseTypes(query.keys, schema)
+  const type = rels.pop()
 
   if (query.params.include) {
     toArray(query.params.include).forEach(str => {
       const arr = str.split(',').filter(Boolean)
 
       arr.forEach(path => {
-        relationships.push(
-          ...parseTypes([type].concat(path.trim().split('.')), schema).slice(1)
-        )
+        const types = [type].concat(path.trim().split('.'))
+        rels.push(...parseTypes(types, schema).slice(1))
       })
     })
   }
 
-  return { type, relationships }
+  if (data) {
+    mergePayloadTypes(type, data, schema, rels)
+  }
+
+  return {
+    type,
+    relationships: rels.filter((r, i) => rels.indexOf(r) === i)
+  }
+}
+
+export function mergePayloadTypes(type, data, schema, types = []) {
+  const config = schema[type]
+
+  if (!config || !config.relationships) {
+    return
+  }
+
+  Object.keys(config.relationships).forEach(key => {
+    if (data[key]) {
+      const rel = config.relationships[key]
+      types.push(rel.type)
+      mergePayloadTypes(rel.type, data[key], schema, types)
+    }
+  })
 }
 
 export function coerceValue(val, type) {
