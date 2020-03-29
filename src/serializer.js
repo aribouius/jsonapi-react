@@ -55,7 +55,7 @@ export class Serializer {
 
       delete attrs[field]
 
-      if (!val.readOnly) {
+      if (!ref.readOnly) {
         if (Array.isArray(val)) {
           rels[field] = {
             data: val.map(v =>
