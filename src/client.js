@@ -157,7 +157,7 @@ export class ApiClient {
       return Promise.resolve(this.normalize(query.cache))
     }
 
-    return (query.promise = (async () => {
+    return query.promise = Promise.resolve().then(async () => {
       if (query.timeout) {
         clearTimeout(query.timeout)
       }
@@ -193,7 +193,7 @@ export class ApiClient {
       }
 
       return result
-    })())
+    })
   }
 
   async mutate(queryArg, data, config = {}) {

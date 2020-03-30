@@ -18,9 +18,7 @@ export function useIsFetching() {
 
   React.useEffect(() => {
     return client.subscribe(() => {
-      if (isFetching !== client.isFetching()) {
-        setIsFetching(!isFetching)
-      }
+      setIsFetching(client.isFetching())
     })
   }, [])
 
