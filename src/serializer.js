@@ -55,15 +55,17 @@ export class Serializer {
 
       delete attrs[field]
 
-      if (Array.isArray(val)) {
-        rels[field] = {
-          data: val.map(v =>
-            this.parseRelationship(ref.type, v)
-          ),
-        }
-      } else {
-        rels[field] = {
-          data: this.parseRelationship(ref.type, val),
+      if (!ref.readOnly) {
+        if (Array.isArray(val)) {
+          rels[field] = {
+            data: val.map(v =>
+              this.parseRelationship(ref.type, v)
+            ),
+          }
+        } else {
+          rels[field] = {
+            data: this.parseRelationship(ref.type, val),
+          }
         }
       }
     }
