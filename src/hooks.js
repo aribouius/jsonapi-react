@@ -31,6 +31,8 @@ export function useQuery(queryArg, config) {
     ssr = client.ssrMode,
     cacheTime = client.config.cacheTime,
     staleTime = client.config.staleTime,
+    onSuccess,
+    onError,
   } = {
     ...useApiContext(),
     ...config,
@@ -40,6 +42,8 @@ export function useQuery(queryArg, config) {
 
   const stateRef = React.useRef()
   const rerender = React.useReducer(i => ++i, 0)[1]
+
+  const mountedRef = React.useRef(false)
 
   const refetch = () => {
     if (!query.url) {
@@ -56,6 +60,11 @@ export function useQuery(queryArg, config) {
     stateRef.current.data = data
     rerender()
   }
+
+  React.useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = null }
+  }, [])
 
   React.useMemo(() => {
     if (!query.key) {
@@ -85,11 +94,18 @@ export function useQuery(queryArg, config) {
 
       if (req.result) {
         state = { isLoading: false, isFetching: false, ...req.result }
+
+        if (state.data && onSuccess) {
+          onSuccess(req.result)
+        } else if (state.error || state.errors && onError) {
+          onError(req.result)
+        }
+
       } else if (req.isFetching && !stateRef.current.isFetching) {
         state = { ...stateRef.current, isFetching: true }
       }
 
-      if (state) {
+      if (state && mountedRef.current) {
         stateRef.current = state
         rerender()
       }
@@ -126,16 +142,31 @@ export function useQuery(queryArg, config) {
 }
 
 export function useMutation(queryArg, config = {}) {
-  const { client = useClient(), ...options } = config
+  const {
+    client = useClient(),
+    initialData,
+    onSuccess,
+    onError,
+    ...options
+  } = config
 
   const [state, setState] = React.useState({
+    data: initialData,
     isLoading: false,
   })
 
-  const isMountedRef = React.useRef(false)
+  const mountedRef = React.useRef(false)
+
+  const setData = data => {
+    setState(prev => ({
+      ...prev,
+      data: typeof data === 'function' ? data(state.data) : data,
+    }))
+  }
 
   React.useEffect(() => {
-    isMountedRef.current = true
+    mountedRef.current = true
+    return () => { mountedRef.current = null }
   }, [])
 
   const mutate = async data => {
@@ -153,7 +184,13 @@ export function useMutation(queryArg, config = {}) {
 
     const result = await promise
 
-    if (isMountedRef.current) {
+    if (mountedRef.current) {
+      if (result.data && onSuccess) {
+        onSuccess(result)
+      }
+      if (result.error || result.errors && onError) {
+        onError(result)
+      }
       setState({
         isLoading: false,
         ...result,
@@ -163,5 +200,5 @@ export function useMutation(queryArg, config = {}) {
     return result
   }
 
-  return [mutate, { ...state, client }]
+  return [mutate, { ...state, setData, client }]
 }
