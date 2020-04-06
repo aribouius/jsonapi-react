@@ -97,7 +97,7 @@ export function useQuery(queryArg, config) {
 
         if (state.data && onSuccess) {
           onSuccess(req.result)
-        } else if (state.error || state.errors && onError) {
+        } else if ((state.error || state.errors) && onError) {
           onError(req.result)
         }
 
@@ -185,16 +185,24 @@ export function useMutation(queryArg, config = {}) {
     const result = await promise
 
     if (mountedRef.current) {
-      if (result.data && onSuccess) {
-        onSuccess(result)
+      if (result.data) {
+        if (onSuccess) {
+          onSuccess(result)
+        }
+        setState({
+          isLoading: false,
+          ...result,
+        })
+      } else {
+        if (onError) {
+          onError(result)
+        }
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          ...result,
+        }))
       }
-      if (result.error || result.errors && onError) {
-        onError(result)
-      }
-      setState({
-        isLoading: false,
-        ...result,
-      })
     }
 
     return result
