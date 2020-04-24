@@ -237,6 +237,11 @@ export class ApiClient {
       }
 
       this.cache.forEach(q => {
+        if (options.method === 'DELETE' && query.id === q.id) {
+          q.cache = null
+          return
+        }
+
         if (q.id && q.url === query.url && schema.data) {
           q.cache = schema
           return q.dispatch({ result })
