@@ -197,7 +197,7 @@ export function useMutation(queryArg, config = {}) {
         if (onError) {
           onError(result)
         }
-        setState(({ promise, ...prev }) => ({
+        setState(({ promise, error, errors, ...prev }) => ({
           ...prev,
           ...result,
           isLoading: false,
