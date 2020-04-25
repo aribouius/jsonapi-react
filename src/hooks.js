@@ -164,6 +164,13 @@ export function useMutation(queryArg, config = {}) {
     }))
   }
 
+  const setErrors = errors => {
+    setState(prev => ({
+      ...prev,
+      errors: typeof errors === 'function' ? errors(state.errors) : errors,
+    }))
+  }
+
   React.useEffect(() => {
     mountedRef.current = true
     return () => { mountedRef.current = null }
@@ -208,5 +215,5 @@ export function useMutation(queryArg, config = {}) {
     return result
   }
 
-  return [mutate, { ...state, setData, client }]
+  return [mutate, { ...state, setData, setErrors, client }]
 }
