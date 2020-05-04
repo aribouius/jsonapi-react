@@ -157,7 +157,7 @@ export class ApiClient {
       return Promise.resolve(this.normalize(query.cache))
     }
 
-    return (query.promise = (async () => {
+    return query.promise = Promise.resolve().then(async () => {
       if (query.timeout) {
         clearTimeout(query.timeout)
       }
@@ -193,7 +193,7 @@ export class ApiClient {
       }
 
       return result
-    })())
+    })
   }
 
   async mutate(queryArg, data, config = {}) {
@@ -201,10 +201,13 @@ export class ApiClient {
 
     const { type, relationships } = getTypeMap(query, this.schema, data)
 
-    const { method = query.id ? 'PATCH' : 'POST', headers, invalidate } = config
-    const options = { method, headers }
+    const { invalidate, ...options } = config
 
-    if (data !== undefined) {
+    if (!options.method) {
+      options.method = query.id ? 'PATCH' : 'POST'
+    }
+
+    if (data && data !== null) {
       data = this.serialize(type, query.id ? { id: query.id, ...data } : data)
       options.body = JSON.stringify(data)
     }
@@ -234,6 +237,11 @@ export class ApiClient {
       }
 
       this.cache.forEach(q => {
+        if (options.method === 'DELETE' && query.id === q.id) {
+          q.cache = null
+          return
+        }
+
         if (q.id && q.url === query.url && schema.data) {
           q.cache = schema
           return q.dispatch({ result })
@@ -297,6 +305,12 @@ export class ApiClient {
 
     if (config.headers) {
       headers = { ...headers, ...config.headers }
+    }
+
+    for (let header in headers) {
+      if (headers[header] === undefined || headers[header] === null) {
+        delete headers[header]
+      }
     }
 
     return this.config

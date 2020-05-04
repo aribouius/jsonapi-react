@@ -26,6 +26,11 @@ export class Serializer {
 
     attrs = { ...attrs }
 
+    if (attrs._type) {
+      type = attrs._type
+      delete attrs._type
+    }
+
     const data = { type }
     const rels = {}
 
