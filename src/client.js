@@ -171,7 +171,7 @@ export class ApiClient {
         isFetching: true,
       })
 
-      query.cache = await this.request(query.url, { headers })
+      query.cache = await this.request(query.url, { headers, signal: query.controller.signal })
       query.timestamp = new Date().getTime()
       query.promise = null
 
@@ -194,6 +194,17 @@ export class ApiClient {
 
       return result
     })
+  }
+
+  cancel(queryArg) {
+    if (queryArg) {
+      const query = this.getQuery(queryArg)
+      query.controller.abort()
+    } else {
+      this.cache.forEach(q => {
+        q.controller.abort()
+      })
+    }
   }
 
   async mutate(queryArg, data, config = {}) {

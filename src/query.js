@@ -7,6 +7,7 @@ export class Query {
     this.timestamp = timestamp
     this.cacheTime = 0
     this.subscribers = []
+    this.controller = new AbortController();
     Object.assign(this, parseQueryArg(key))
   }
 
