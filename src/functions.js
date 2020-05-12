@@ -16,11 +16,12 @@ export function toArray(val) {
   return Array.isArray(val) ? val : [val]
 }
 
-export function stringify(params) {
+export function stringify(params, options) {
   return qs(params, {
     sort: (a, b) => a.localeCompare(b),
     arrayFormat: 'comma',
     encodeValuesOnly: true,
+    ...options,
   })
 }
 
@@ -64,7 +65,7 @@ export function parseSchema(schema = {}) {
   }, {})
 }
 
-export function parseQueryArg(arg) {
+export function parseQueryArg(arg, options = {}) {
   if (!arg) {
     return {}
   }
@@ -83,7 +84,12 @@ export function parseQueryArg(arg) {
   let url = `/${keys.join('/')}`
 
   if (params) {
-    url += `?${stringify(params)}`
+    url += '?'
+    if (typeof options.stringify === 'function') {
+      url += options.stringify(params, stringify)
+    } else {
+      url += stringify(params, options.stringify)
+    }
   } else {
     params = {}
   }
