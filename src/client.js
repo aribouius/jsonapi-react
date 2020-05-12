@@ -172,6 +172,7 @@ export class ApiClient {
       })
 
       query.cache = await this.request(query.url, { headers })
+
       query.timestamp = new Date().getTime()
       query.promise = null
 
@@ -189,7 +190,7 @@ export class ApiClient {
       })
 
       if (!this.config.ssrMode && !query.subscribers.length) {
-        this.scheduleGC(query, query.cacheTime)
+        this.scheduleGC(query)
       }
 
       return result
@@ -274,15 +275,25 @@ export class ApiClient {
     return this.mutate(queryArg, undefined, { ...config, method: 'DELETE' })
   }
 
-  scheduleGC(query, cacheTime) {
+  removeQuery(query) {
+    this.cache = this.cache.filter(q => q !== query)
+  }
+
+  scheduleGC(query) {
+    if (query.timeout) return
+
     const timestamp = query.timestamp || 0
-    cacheTime = cacheTime || 0
+    const cacheTime = query.cacheTime || 0
+    const expires = timestamp + (cacheTime * 1000)
+    const timeout = Math.max(0, expires - new Date().getTime())
 
-    const delay = new Date().getTime() - timestamp + cacheTime * 1000
-
-    query.timeout = setTimeout(() => {
-      this.cache = this.cache.filter(q => q !== query)
-    }, Math.max(0, delay))
+    if (timeout) {
+      query.timeout = setTimeout(() => {
+        this.removeQuery(query)
+      }, timeout)
+    } else {
+      this.removeQuery(query)
+    }
   }
 
   clearCache() {

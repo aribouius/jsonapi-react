@@ -117,10 +117,7 @@ export function useQuery(queryArg, config) {
 
     return () => {
       cleanup()
-
-      if (!query.timeout) {
-        client.scheduleGC(query, cacheTime)
-      }
+      client.scheduleGC(query)
     }
   }, [query])
 
