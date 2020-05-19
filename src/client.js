@@ -18,6 +18,7 @@ export class ApiClient {
       ssrMode: typeof window === 'undefined',
       formatError: null,
       formatErrors: null,
+      stringify: null,
       serialize: (type, data, schema) => {
         return new Serializer({ schema }).serialize(type, data)
       },
@@ -111,9 +112,16 @@ export class ApiClient {
     return false
   }
 
+  createQuery(options) {
+    return new Query({
+      stringify: this.config.stringify,
+      ...options,
+    })
+  }
+
   getQuery(query) {
     if (!(query instanceof Query)) {
-      query = new Query({ key: query })
+      query = this.createQuery({ key: query })
     }
 
     if (!query.url) {
@@ -198,7 +206,7 @@ export class ApiClient {
   }
 
   async mutate(queryArg, data, config = {}) {
-    const query = new Query({ key: queryArg })
+    const query = this.createQuery({ key: queryArg })
 
     const { type, relationships } = getTypeMap(query, this.schema, data)
 
@@ -358,7 +366,7 @@ export class ApiClient {
   hydrate(queries = []) {
     const timestamp = new Date().getTime()
     queries.forEach(([key, cache]) => {
-      this.cache.push(new Query({ key, cache, timestamp }))
+      this.cache.push(this.createQuery({ key, cache, timestamp }))
     })
   }
 }
