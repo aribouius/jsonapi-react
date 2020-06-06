@@ -84,6 +84,14 @@ export class ApiClient {
     }
   }
 
+  onError(callback) {
+    return this.subscribe(({ type, ...result }) => {
+      if (result.error || result.errors) {
+        callback(result)
+      }
+    })
+  }
+
   dispatch(action) {
     this.subscribers.forEach(callback => callback(action))
   }
