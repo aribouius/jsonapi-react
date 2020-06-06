@@ -37,6 +37,9 @@ export default {
       comments: {
         type: 'comments',
       },
+      photos: {
+        type: 'photos',
+      },
     },
   },
   comments: {
@@ -50,4 +53,22 @@ export default {
       },
     },
   },
+  photos: {
+    type: 'photos',
+    fields: {
+      owner_type: {
+        readOnly: true,
+      },
+      url: {
+        resolve: (_, attrs) => `/photos/${attrs.name}`
+      },
+    },
+    relationships: {
+      owner: {
+        getType: attrs => {
+          return attrs.owner_type
+        }
+      }
+    }
+  }
 }

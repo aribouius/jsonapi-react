@@ -28,7 +28,9 @@ describe('serialize', () => {
         id: 2,
         name: 'Steve',
       },
-      comments: [{ id: '1', text: 'Almost done...' }],
+      comments: [
+        { id: '1', text: 'Almost done...' }
+      ],
     }
 
     const result = serializer.serialize('todos', data)
@@ -48,7 +50,42 @@ describe('serialize', () => {
             },
           },
           comments: {
-            data: [{ type: 'comments', id: '1' }],
+            data: [
+              { type: 'comments', id: '1' }
+            ],
+          },
+        },
+      },
+    })
+  })
+
+  test('it serializes polymorphic resources', () => {
+    const serializer = new Serializer({ schema })
+
+    const data = {
+      id: 1,
+      name: 'todo.jpg',
+      owner_type: 'todos',
+      owner: {
+        id: 1,
+      }
+    }
+
+    const result = serializer.serialize('photos', data)
+
+    expect(result).toEqual({
+      data: {
+        id: '1',
+        type: 'photos',
+        attributes: {
+          name: 'todo.jpg',
+        },
+        relationships: {
+          owner: {
+            data: {
+              type: 'todos',
+              id: '1',
+            },
           },
         },
       },
@@ -139,5 +176,50 @@ describe('deserialize', () => {
 
     const isDate = result.data.created instanceof Date
     expect(isDate).toEqual(true)
+  })
+
+  test('it handles polymorphic resources', () => {
+    const serializer = new Serializer({ schema })
+
+    const result = serializer.deserialize({
+      data: {
+        id: '1',
+        type: 'photos',
+        attributes: {
+          name: 'photo.jpg',
+        },
+        relationships: {
+          owner: {
+            data: {
+              type: 'todos',
+              id: '1',
+            },
+          },
+        },
+      },
+      included: [
+        {
+          id: '1',
+          type: 'todos',
+          attributes: {
+            title: 'Clean the kitchen!',
+            status: 'done',
+          },
+        },
+      ],
+    })
+
+    expect(result).toEqual({
+      data: {
+        id: '1',
+        name: 'photo.jpg',
+        url: '/photos/photo.jpg',
+        owner: {
+          id: '1',
+          title: 'Clean the kitchen!',
+          status: 'DONE',
+        },
+      },
+    })
   })
 })

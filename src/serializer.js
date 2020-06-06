@@ -44,12 +44,6 @@ export class Serializer {
       return { ...data, attributes: attrs }
     }
 
-    for (let field in config.fields) {
-      if (config.fields[field] && config.fields[field].readOnly) {
-        delete attrs[field]
-      }
-    }
-
     for (let field in config.relationships) {
       if (attrs[field] === undefined) {
         continue
@@ -60,18 +54,30 @@ export class Serializer {
 
       delete attrs[field]
 
+      const relType = ref.type || (ref.getType ? ref.getType(attrs) : null)
+
+      if (!relType) {
+        continue
+      }
+
       if (!ref.readOnly) {
         if (Array.isArray(val)) {
           rels[field] = {
             data: val.map(v =>
-              this.parseRelationship(ref.type, v)
+              this.parseRelationship(relType, v)
             ),
           }
         } else {
           rels[field] = {
-            data: this.parseRelationship(ref.type, val),
+            data: this.parseRelationship(relType, val),
           }
         }
+      }
+    }
+
+    for (let field in config.fields) {
+      if (config.fields[field] && config.fields[field].readOnly) {
+        delete attrs[field]
       }
     }
 
