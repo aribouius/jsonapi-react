@@ -135,6 +135,7 @@ export class Serializer {
     data = data.map(rec => {
       const attrs = {
         id: rec.id,
+        type: rec.type,
         ...rec.attributes,
       }
 

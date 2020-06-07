@@ -218,9 +218,11 @@ Gets normalized to...
 ```javascript
 {
   id: "1",
+  type: "todos",
   title: "Clean the kitchen!",
   user: {
     id: "2",
+    type: users",
     name: "Steve"
   }
 }
