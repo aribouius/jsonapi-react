@@ -149,7 +149,7 @@ export class Serializer {
           }
 
           if (typeof ref.resolve === 'function') {
-            attrs[field] = ref.resolve(attrs[field], attrs)
+            attrs[field] = ref.resolve(attrs[field], attrs, rec)
           }
         }
       }
