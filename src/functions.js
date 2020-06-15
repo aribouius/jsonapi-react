@@ -12,6 +12,10 @@ export function isNumber(n) {
   return !isNaN(Number(n))
 }
 
+export function isUUID(v) {
+  return isString(v) && v.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+}
+
 export function toArray(val) {
   return Array.isArray(val) ? val : [val]
 }
@@ -94,11 +98,12 @@ export function parseQueryArg(arg, options = {}) {
     params = {}
   }
 
-  if (isNumber(keys[keys.length - 1])) {
+  const last = keys[keys.length - 1]
+  if (isNumber(last) || isUUID(last)) {
     id = String(keys.pop())
   }
 
-  keys = keys.filter(k => !isNumber(k))
+  keys = keys.filter(k => !isNumber(k) && !isUUID(k))
 
   return {
     url,

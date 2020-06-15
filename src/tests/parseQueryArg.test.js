@@ -56,6 +56,18 @@ test('it parses an array with an ID', () => {
   })
 })
 
+test('it parses an array with an ID', () => {
+  const uuid = '48004eaf-d51d-4e2e-916d-ccd554245a5e'
+  const result = parseQueryArg(['todos', uuid])
+
+  expect(result).toEqual({
+    url: `/todos/${uuid}`,
+    id: uuid,
+    params: {},
+    keys: ['todos'],
+  })
+})
+
 test('it parses an array with multiple segments', () => {
   const result = parseQueryArg(['users', 1, 'todos'])
 
