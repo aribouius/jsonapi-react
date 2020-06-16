@@ -97,10 +97,12 @@ export function useQuery(queryArg, config) {
 
         if (state.data && onSuccess) {
           onSuccess(req.result)
+        } else if (state.error && state.error.name === 'AbortError') {
+          state = { ...stateRef.current }
+          delete state.error
         } else if ((state.error || state.errors) && onError) {
           onError(req.result)
         }
-
       } else if (req.isFetching && !stateRef.current.isFetching) {
         state = { ...stateRef.current, isFetching: true }
       }

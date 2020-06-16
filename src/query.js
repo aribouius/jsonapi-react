@@ -7,6 +7,7 @@ export class Query {
     this.timestamp = timestamp
     this.cacheTime = 0
     this.subscribers = []
+    this.isFetching = false
     Object.assign(this, parseQueryArg(key, { stringify }))
   }
 
@@ -18,9 +19,9 @@ export class Query {
     }
   }
 
-  dispatch(request) {
+  dispatch(action) {
     this.subscribers.forEach(callback => {
-      callback(request)
+      callback(action)
     })
   }
 }

@@ -97,7 +97,7 @@ export class ApiClient {
   }
 
   isFetching() {
-    return !!this.cache.find(q => q.promise)
+    return !!this.cache.find(q => q.isFetching)
   }
 
   isCached(query, cacheTime) {
@@ -173,26 +173,30 @@ export class ApiClient {
       return Promise.resolve(this.normalize(query.cache))
     }
 
-    return query.promise = Promise.resolve().then(async () => {
-      if (query.timeout) {
-        clearTimeout(query.timeout)
-      }
+    if (query.timeout) {
+      clearTimeout(query.timeout)
+    }
 
-      this.dispatch({
-        type: actions.REQUEST_QUERY,
-        query,
-      })
+    query.isFetching = true
 
-      query.dispatch({
-        isFetching: true,
-      })
+    this.dispatch({
+      type: actions.REQUEST_QUERY,
+      query,
+    })
 
-      query.cache = await this.request(query.url, { headers })
+    query.dispatch({
+      isFetching: true,
+    })
 
+    const request = this.request(query.url, { headers })
+
+    const promise = (async () => {
+      query.cache = await request
       query.timestamp = new Date().getTime()
-      query.promise = null
 
-      const result = this.normalize(query.cache)
+      let result = this.normalize(query.cache)
+
+      query.isFetching = false
 
       this.dispatch({
         type: actions.RECEIVE_QUERY,
@@ -210,7 +214,11 @@ export class ApiClient {
       }
 
       return result
-    })
+    })()
+
+    promise.abort = request.abort
+
+    return promise
   }
 
   async mutate(queryArg, data, config = {}) {
@@ -340,26 +348,42 @@ export class ApiClient {
       }
     }
 
-    return this.config
-      .fetch(uri, {
-        ...this.config.fetchOptions,
-        ...config,
-        headers: {
-          ...this.config.headers,
-          ...headers,
-        },
-      })
+    const options = {
+      ...this.config.fetchOptions,
+      ...config,
+      headers: {
+        ...this.config.headers,
+        ...headers,
+      },
+    }
+
+    let abort
+    if (typeof AbortController !== undefined) {
+      const controller = new AbortController()
+      options.signal = controller.signal
+      abort = () => controller.abort()
+    }
+
+    const promise = this.config
+      .fetch(uri, options)
       .then(res => {
         return res.status === 204 ? {} : res.json()
       })
       .catch(error => {
         return {
           error: {
-            status: '500',
+            status: String(error.code || 500),
             title: error.message,
+            name: error.name,
           },
         }
       })
+
+    if (abort) {
+      promise.abort = abort
+    }
+
+    return promise
   }
 
   extract() {
