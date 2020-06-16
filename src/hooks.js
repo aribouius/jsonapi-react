@@ -98,7 +98,7 @@ export function useQuery(queryArg, config) {
         if (state.data && onSuccess) {
           onSuccess(req.result)
         } else if (state.error && state.error.name === 'AbortError') {
-          state = { ...stateRef.current }
+          state = { ...stateRef.current, ...state }
           delete state.error
         } else if ((state.error || state.errors) && onError) {
           onError(req.result)
