@@ -76,8 +76,10 @@ export class Serializer {
     }
 
     for (let field in config.fields) {
-      if (config.fields[field] && config.fields[field].readOnly) {
+      if (config.fields[field].readOnly) {
         delete attrs[field]
+      } else if (config.fields[field].serialize) {
+        attrs[field] = config.fields[field].serialize(attrs[field], attrs)
       }
     }
 

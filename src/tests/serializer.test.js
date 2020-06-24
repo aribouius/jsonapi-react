@@ -112,6 +112,45 @@ describe('serialize', () => {
       },
     })
   })
+
+  test('it supports a field serializer', () => {
+    const serializer = new Serializer({
+      schema: {
+        ...schema,
+        todos: {
+          ...schema.todos,
+          fields: {
+            ...schema.todos.fields,
+            title: {
+              serialize: (val, attrs) => {
+                console.log('SERIALIZING', val, attrs)
+                return `${val}${attrs.description}`
+              }
+            }
+          }
+        }
+      }
+    })
+
+    const data = {
+      id: 1,
+      title: 'foo',
+      description: 'bar',
+    }
+
+    const result = serializer.serialize('todos', data)
+
+    expect(result).toEqual({
+      data: {
+        id: '1',
+        type: 'todos',
+        attributes: {
+          title: 'foobar',
+          description: 'bar',
+        },
+      },
+    })
+  })
 })
 
 describe('deserialize', () => {
