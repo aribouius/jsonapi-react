@@ -56,10 +56,6 @@ export class Serializer {
 
       const relType = ref.type || (ref.getType ? ref.getType(attrs) : null)
 
-      if (!relType) {
-        continue
-      }
-
       if (!ref.readOnly) {
         if (Array.isArray(val)) {
           rels[field] = {
@@ -78,7 +74,7 @@ export class Serializer {
     for (let field in config.fields) {
       if (config.fields[field].readOnly) {
         delete attrs[field]
-      } else if (config.fields[field].serialize) {
+      } else if (attrs[field] !== undefined && config.fields[field].serialize) {
         attrs[field] = config.fields[field].serialize(attrs[field], attrs)
       }
     }
