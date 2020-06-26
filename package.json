@@ -1,6 +1,6 @@
 {
   "name": "jsonapi-react",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "A minimal JSON:API client and React hooks for fetching, updating, and caching remote data.",
   "author": "aribouius",
   "license": "MIT",

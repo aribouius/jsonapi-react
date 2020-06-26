@@ -358,7 +358,7 @@ export class ApiClient {
     }
 
     let abort
-    if (typeof AbortController !== undefined) {
+    if (typeof AbortController !== 'undefined') {
       const controller = new AbortController()
       options.signal = controller.signal
       abort = () => controller.abort()
