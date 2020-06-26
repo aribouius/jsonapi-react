@@ -149,12 +149,14 @@ export function useMutation(queryArg, config = {}) {
     ...options
   } = config
 
+  const mountedRef = React.useRef(false)
+
+  const query = client.getQuery(queryArg)
+
   const [state, setState] = React.useState({
     data: initialData,
     isLoading: false,
   })
-
-  const mountedRef = React.useRef(false)
 
   const setData = data => {
     setState(prev => ({
@@ -171,6 +173,10 @@ export function useMutation(queryArg, config = {}) {
   }
 
   React.useEffect(() => {
+    setData(initialData)
+  }, [query])
+
+  React.useEffect(() => {
     mountedRef.current = true
     return () => { mountedRef.current = null }
   }, [])
@@ -180,7 +186,7 @@ export function useMutation(queryArg, config = {}) {
       return state.promise
     }
 
-    const promise = client.mutate(queryArg, data, options)
+    const promise = client.mutate(query, data, options)
 
     setState(prev => ({
       ...prev,

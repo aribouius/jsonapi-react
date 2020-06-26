@@ -222,7 +222,7 @@ export class ApiClient {
   }
 
   async mutate(queryArg, data, config = {}) {
-    const query = this.createQuery({ key: queryArg })
+    const query = this.getQuery(queryArg)
 
     const { type, relationships } = getTypeMap(query, this.schema, data)
 
@@ -267,7 +267,7 @@ export class ApiClient {
           return
         }
 
-        if (q.id && q.url === query.url && schema.data) {
+        if (q.id && q === query && schema.data) {
           q.cache = schema
           return q.dispatch({ result })
         }
