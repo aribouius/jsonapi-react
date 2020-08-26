@@ -33,6 +33,7 @@ export function useQuery(queryArg, config) {
     staleTime = client.config.staleTime,
     onSuccess,
     onError,
+    initialData,
   } = {
     ...useApiContext(),
     ...config,
@@ -69,6 +70,7 @@ export function useQuery(queryArg, config) {
   React.useMemo(() => {
     if (!query.key) {
       stateRef.current = {
+        data: initialData,
         isLoading: false,
         isFetching: false,
         ...stateRef.current,
@@ -81,6 +83,7 @@ export function useQuery(queryArg, config) {
       }
     } else {
       stateRef.current = {
+        data: initialData,
         ...stateRef.current,
         isLoading: true,
         isFetching: true,
