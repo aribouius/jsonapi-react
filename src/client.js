@@ -190,13 +190,13 @@ export class ApiClient {
 
     const request = this.request(query.url, { headers })
 
-    const promise = (async () => {
+    query.promise = (async () => {
       query.cache = await request
+      query.promise = null
+      query.isFetching = false
       query.timestamp = new Date().getTime()
 
       let result = this.normalize(query.cache)
-
-      query.isFetching = false
 
       this.dispatch({
         type: actions.RECEIVE_QUERY,
@@ -216,9 +216,9 @@ export class ApiClient {
       return result
     })()
 
-    promise.abort = request.abort
+    query.promise.abort = request.abort
 
-    return promise
+    return query.promise
   }
 
   async mutate(queryArg, data, config = {}) {
