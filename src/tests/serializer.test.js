@@ -123,7 +123,6 @@ describe('serialize', () => {
             ...schema.todos.fields,
             title: {
               serialize: (val, attrs) => {
-                console.log('SERIALIZING', val, attrs)
                 return `${val}${attrs.description}`
               }
             }
