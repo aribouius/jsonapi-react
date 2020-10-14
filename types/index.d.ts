@@ -3,16 +3,23 @@ declare module 'jsonapi-react' {
     initialize(client: ApiClient): void
   }
 
-  type IQueryArg = string | any[] | false
+  type Falsey = false | undefined | null
 
-  type IStringMap = { [key: string]: any }
+  type QueryArg<TQueryParams = any> = Falsey | string | [
+    type: string,
+    queryParams?: TQueryParams,
+    ...queryKeys: any[],
+  ]
 
-  interface IResult {
-    data?: IStringMap | IStringMap[]
-    meta?: IStringMap
-    links?: IStringMap
-    error?: IStringMap
-    errors?: IStringMap[]
+  type StringMap = { [key: string]: any }
+
+  interface IResult<TData = StringMap | StringMap[]> {
+    data?: TData
+    meta?: StringMap
+    links?: StringMap
+    error?: StringMap
+    errors?: StringMap[]
+    refetch?: () => void
     isLoading?: boolean
     isFetching?: boolean
     client: ApiClient
@@ -28,6 +35,7 @@ declare module 'jsonapi-react' {
     formatError?: (error) => any
     formatErrors?: (errors) => any
     fetch?: (url: string, options: {}) => Promise<{}>
+    stringify?: <TQueryParams = any>(q: TQueryParams) => string
     fetchOptions?: {}
   }
 
@@ -43,14 +51,14 @@ declare module 'jsonapi-react' {
 
     clearCache(): void
 
-    delete(queryArg: IQueryArg, config: IConfig): Promise<IResult>
+    delete(queryArg: QueryArg, config: IConfig): Promise<IResult>
 
-    fetch(queryArg: IQueryArg, config: IConfig): Promise<IResult>
+    fetch(queryArg: QueryArg, config: IConfig): Promise<IResult>
 
     isFetching(): boolean
 
     mutate(
-      queryArg: IQueryArg,
+      queryArg: QueryArg,
       data: {} | [],
       config: IConfig
     ): Promise<IResult>
@@ -78,22 +86,22 @@ declare module 'jsonapi-react' {
 
   export function useIsFetching(): { isFetching: boolean }
 
-  export function useMutation(
-    queryArg: IQueryArg,
+  export function useMutation<TData = StringMap | StringMap[]>(
+    queryArg: QueryArg,
     config?: {
       invalidate?: string | string[]
       method?: string
       client?: ApiClient
     }
-  ): [mutate: (any) => Promise<IResult>, result: IResult]
+  ): [mutate: (any) => Promise<IResult<TData>>, result: IResult<TData>]
 
-  export function useQuery(
-    queryArg: IQueryArg,
+  export function useQuery<TData = StringMap | StringMap[]>(
+    queryArg: QueryArg,
     config?: {
       cacheTime?: number
       staleTime?: number
       ssr?: boolean
       client?: ApiClient
     }
-  ): IResult
+  ): IResult<TData>
 }
