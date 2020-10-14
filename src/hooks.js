@@ -34,6 +34,7 @@ export function useQuery(queryArg, config) {
     onSuccess,
     onError,
     initialData,
+    hydrate,
   } = {
     ...useApiContext(),
     ...config,
@@ -53,6 +54,7 @@ export function useQuery(queryArg, config) {
     return client.fetch(query, {
       force: true,
       cacheTime,
+      hydrate,
     })
   }
 
@@ -129,7 +131,6 @@ export function useQuery(queryArg, config) {
   if (
     ssr !== false &&
     client.config.ssrMode &&
-    !query.promise &&
     !query.cache
   ) {
     refetch()

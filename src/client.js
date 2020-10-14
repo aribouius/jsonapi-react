@@ -155,11 +155,13 @@ export class ApiClient {
       cacheTime = this.config.cacheTime,
       staleTime = this.config.staleTime,
       headers,
+      hydrate,
     } = config
 
     const query = this.getQuery(queryArg)
 
     query.cacheTime = Math.max(cacheTime, query.cacheTime)
+    query.hydrate = query.hydrate || hydrate
 
     if (query.promise) {
       return query.promise
@@ -388,7 +390,7 @@ export class ApiClient {
 
   extract() {
     return this.cache.reduce((acc, q) => {
-      if (q.cache) {
+      if (q.cache && q.hydrate !== false) {
         acc.push([q.key, q.cache])
       }
       return acc
