@@ -51,16 +51,16 @@ declare module 'jsonapi-react' {
 
     clearCache(): void
 
-    delete(queryArg: QueryArg, config: IConfig): Promise<IResult>
+    delete(queryArg: QueryArg, config?: IConfig): Promise<IResult>
 
-    fetch(queryArg: QueryArg, config: IConfig): Promise<IResult>
+    fetch(queryArg: QueryArg, config?: IConfig): Promise<IResult>
 
     isFetching(): boolean
 
     mutate(
       queryArg: QueryArg,
       data: {} | [],
-      config: IConfig
+      config?: IConfig
     ): Promise<IResult>
 
     removeHeader(key: string): ApiClient
