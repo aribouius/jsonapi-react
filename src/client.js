@@ -264,7 +264,7 @@ export class ApiClient {
       }
 
       this.cache.forEach(q => {
-        if (options.method === 'DELETE' && query.id === q.id) {
+        if (options.method === 'DELETE' && q.id && query.id === q.id) {
           q.cache = null
           return
         }

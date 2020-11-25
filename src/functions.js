@@ -8,6 +8,10 @@ export function isObject(v) {
   return v && typeof v === 'object' && !Array.isArray(v)
 }
 
+export function isId(n) {
+  return !!(n && String(n).match(/^[0-9]+/))
+}
+
 export function isNumber(n) {
   return !isNaN(Number(n))
 }
@@ -99,11 +103,11 @@ export function parseQueryArg(arg, options = {}) {
   }
 
   const last = keys[keys.length - 1]
-  if (isNumber(last) || isUUID(last)) {
+  if (isId(last) || isUUID(last)) {
     id = String(keys.pop())
   }
 
-  keys = keys.filter(k => !isNumber(k) && !isUUID(k))
+  keys = keys.filter(k => !isId(k) && !isUUID(k))
 
   return {
     url,
