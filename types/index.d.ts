@@ -102,6 +102,7 @@ declare module 'jsonapi-react' {
       staleTime?: number
       ssr?: boolean
       client?: ApiClient
+      initialData?: TData
     }
   ): IResult<TData>
 }
