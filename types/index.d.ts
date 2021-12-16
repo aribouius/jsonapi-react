@@ -89,7 +89,7 @@ declare module 'jsonapi-react' {
   export function useMutation<TData = StringMap | StringMap[]>(
     queryArg: QueryArg,
     config?: {
-      invalidate?: string | string[]
+      invalidate?: boolean | string | string[]
       method?: string
       client?: ApiClient
     }
