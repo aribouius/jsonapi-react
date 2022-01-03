@@ -330,14 +330,12 @@ const [mutation] = useMutation(['todos', 1], {
 })
 ```
 
-To ignore invalidation, even with the same type as your mutation, just set `false` for the `invalidate` option:
+To prevent any invalidation from taking place, pass false to the `invalidate` option.
 ```JavaScript
 const [mutation] = useMutation(['todos', 1], {
   invalidate: false
 })
 ```
-
-This way the list of "todos" won't be updated after a mutation.
 
 ## Manual Requests
 Manual API requests can be performed through the client instance, which can be obtained with the [useClient](#useClient) hook
